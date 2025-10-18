@@ -12,21 +12,34 @@ export function Podcasts() {
   useEffect(() => {
     const fetchPodcasts = async () => {
       setIsLoading(true);
-      let query = supabase
-        .from('podcasts')
-        .select('*')
-        .order('published_at', { ascending: false });
-
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
+      
+      // Vérifier si Supabase est configuré
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+        console.log('Supabase not configured, using static data');
+        setIsLoading(false);
+        return;
       }
 
-      const { data } = await query;
+      try {
+        let query = supabase
+          .from('podcasts')
+          .select('*')
+          .order('published_at', { ascending: false });
 
-      if (data) {
-        setPodcasts(data);
-        const uniqueCategories = [...new Set(data.map((p) => p.category))];
-        setCategories(uniqueCategories);
+        if (selectedCategory !== 'all') {
+          query = query.eq('category', selectedCategory);
+        }
+
+        const { data } = await query;
+
+        if (data) {
+          setPodcasts(data);
+          const uniqueCategories = [...new Set(data.map((p) => p.category))];
+          setCategories(uniqueCategories);
+        }
+      } catch (error) {
+        console.error('Error fetching podcasts:', error);
       }
 
       setIsLoading(false);

@@ -12,34 +12,45 @@ export function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [podcasts, formations, articles, events] = await Promise.all([
-        supabase
-          .from('podcasts')
-          .select('*')
-          .order('published_at', { ascending: false })
-          .limit(3),
-        supabase
-          .from('formations')
-          .select('*')
-          .order('published_at', { ascending: false })
-          .limit(3),
-        supabase
-          .from('articles')
-          .select('*')
-          .order('published_at', { ascending: false })
-          .limit(3),
-        supabase
-          .from('events')
-          .select('*')
-          .eq('is_past', false)
-          .order('event_date', { ascending: true })
-          .limit(3),
-      ]);
+      // Vérifier si Supabase est configuré
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+        console.log('Supabase not configured, using static data');
+        return;
+      }
 
-      if (podcasts.data) setRecentPodcasts(podcasts.data);
-      if (formations.data) setRecentFormations(formations.data);
-      if (articles.data) setRecentArticles(articles.data);
-      if (events.data) setUpcomingEvents(events.data);
+      try {
+        const [podcasts, formations, articles, events] = await Promise.all([
+          supabase
+            .from('podcasts')
+            .select('*')
+            .order('published_at', { ascending: false })
+            .limit(3),
+          supabase
+            .from('formations')
+            .select('*')
+            .order('published_at', { ascending: false })
+            .limit(3),
+          supabase
+            .from('articles')
+            .select('*')
+            .order('published_at', { ascending: false })
+            .limit(3),
+          supabase
+            .from('events')
+            .select('*')
+            .eq('is_past', false)
+            .order('event_date', { ascending: true })
+            .limit(3),
+        ]);
+
+        if (podcasts.data) setRecentPodcasts(podcasts.data);
+        if (formations.data) setRecentFormations(formations.data);
+        if (articles.data) setRecentArticles(articles.data);
+        if (events.data) setUpcomingEvents(events.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
 
     fetchData();
