@@ -1,9 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+const url = import.meta.env.VITE_SUPABASE_URL
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!url) {
+  throw new Error('VITE_SUPABASE_URL manquant (Netlify env var)')
+}
+if (!anonKey) {
+  throw new Error('VITE_SUPABASE_ANON_KEY manquant (Netlify env var)')
+}
+
+export const supabase = createClient(url, anonKey)
+
 
 export type Podcast = {
   id: string;
